@@ -1,0 +1,20 @@
+Create a template monorepo for a for a vite+react front, with a fastAPI backend utilizing sqlalchemy, and Postgres for a database, and Traefik Proxy. I want a docker compose config that supports local dev with hot reload and one for a production build.
+
+The local development does not requirement Traefik only the server build does.
+
+For the fastapi backend it must be using pydantic. It should also pytest and Hypothesis for testing.
+
+The vite+react frontend must support mobile devices. The starting point for the monorepo is to have a landing page that supports registration and signin for google and apple as well as magiklink via email.
+
+For local development it should support hot reloading.
+
+For production it should build images that can be uploaded to ghcr.io
+
+pnpm should be used
+
+Both the frontend and backend should support a build-info file that is created as part of the build process. This will include the version, build number, git info, test or prod.
+
+FastApi should be using openapi and should generate typescript types for the frontend to use.
+
+For the backend it must be using mypy and all changes should be verified by mypy.
+The functions in the python backend must use pydantic types .

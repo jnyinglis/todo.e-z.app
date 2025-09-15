@@ -1,0 +1,39 @@
+# Development Dockerfile for Frontend
+FROM node:24-alpine
+
+WORKDIR /app
+
+# Install pnpm
+RUN npm install -g pnpm@8
+
+# Copy package files
+COPY package.json pnpm-lock.yaml* ./
+
+# Install dependencies
+RUN pnpm install
+
+# Copy source code
+COPY . .
+
+# Build arguments for build info
+ARG BUILD_VERSION=dev
+ARG BUILD_NUMBER=local
+ARG GIT_COMMIT=unknown
+ARG ENVIRONMENT=development
+
+# Create build info for development
+RUN echo "{ \
+  \"version\": \"$BUILD_VERSION\", \
+  \"buildNumber\": \"$BUILD_NUMBER\", \
+  \"gitCommit\": \"$GIT_COMMIT\", \
+  \"environment\": \"$ENVIRONMENT\", \
+  \"buildTime\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\" \
+}" > public/build-info.json
+
+EXPOSE 5173
+
+# Backup node_modules before volume mount
+RUN cp -r /app/node_modules /node_modules_backup
+
+# Start development server with hot reload
+CMD ["pnpm", "dev", "--host", "0.0.0.0"]

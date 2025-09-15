@@ -1,0 +1,42 @@
+{
+  "name": "vite-react-fastapi-postgres-template",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Full-stack monorepo template with Vite+React frontend, FastAPI backend, and PostgreSQL database",
+  "scripts": {
+    "setup": "./scripts/setup.sh",
+    "dev": "docker-compose -f docker-compose.dev.yml up",
+    "dev:build": "docker-compose -f docker-compose.dev.yml up --build",
+    "prod": "docker-compose -f docker-compose.prod.yml up -d",
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "test:frontend": "cd frontend && pnpm test",
+    "test:backend": "cd backend && python -m pytest",
+    "lint": "pnpm -r lint",
+    "lint:fix": "cd frontend && pnpm run lint --fix",
+    "type-check": "pnpm -r type-check",
+    "type-check:backend": "cd backend && python run_checks.py",
+    "clean": "pnpm -r clean",
+    "stop": "docker-compose -f docker-compose.dev.yml down && docker-compose -f docker-compose.prod.yml down",
+    "logs": "docker-compose -f docker-compose.dev.yml logs -f",
+    "health": "curl -f http://localhost:8000/api/health",
+    "migrate": "docker-compose -f docker-compose.dev.yml exec backend alembic upgrade head",
+    "generate-types": "cd backend && python generate_types.py"
+  },
+  "workspaces": [
+    "frontend",
+    "backend",
+    "shared"
+  ],
+  "packageManager": "pnpm@10.16.0",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/vite-react-fastapi-postgres-template.git"
+  },
+  "author": "",
+  "license": "MIT"
+}

@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Template Setup Wizard</title>
+    <style>
+      :root {
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --secondary: #374151;
+        --success: #22c55e;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+        --bg-primary: #0f172a;
+        --bg-secondary: #0b1220;
+        --bg-tertiary: #111827;
+        --border: #1f2937;
+        --text-primary: #e5e7eb;
+        --text-secondary: #cbd5e1;
+        --text-muted: #94a3b8;
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        margin: 0;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        line-height: 1.6;
+      }
+
+      /* Header */
+      header {
+        padding: 20px 32px;
+        background: var(--bg-tertiary);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .header-content h1 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 600;
+      }
+
+      .header-content p {
+        margin: 4px 0 0 0;
+        color: var(--text-muted);
+        font-size: 14px;
+      }
+
+      .setup-progress {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .progress-step {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 600;
+        background: var(--bg-secondary);
+        border: 2px solid var(--border);
+        color: var(--text-muted);
+      }
+
+      .progress-step.active {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: white;
+      }
+
+      .progress-step.completed {
+        background: var(--success);
+        border-color: var(--success);
+        color: white;
+      }
+
+      .progress-connector {
+        width: 24px;
+        height: 2px;
+        background: var(--border);
+      }
+
+      .progress-connector.completed {
+        background: var(--success);
+      }
+
+      /* Main Layout */
+      main {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 32px;
+      }
+
+      .wizard-container {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+
+      .step-content {
+        padding: 32px;
+        min-height: 500px;
+        display: none;
+      }
+
+      .step-content.active {
+        display: block;
+      }
+
+      .step-header {
+        text-align: center;
+        margin-bottom: 32px;
+      }
+
+      .step-header h2 {
+        margin: 0 0 8px 0;
+        font-size: 28px;
+        font-weight: 700;
+      }
+
+      .step-header p {
+        margin: 0;
+        color: var(--text-secondary);
+        font-size: 16px;
+      }
+
+      /* Form Elements */
+      .form-grid {
+        display: grid;
+        gap: 20px;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .form-group.full {
+        grid-column: 1 / -1;
+      }
+
+      label {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-secondary);
+      }
+
+      label .required {
+        color: var(--danger);
+      }
+
+      input, select, textarea {
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        font-size: 14px;
+        transition: border-color 0.2s;
+      }
+
+      input:focus, select:focus, textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+      }
+
+      .input-help {
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+
+      .input-error {
+        font-size: 12px;
+        color: var(--danger);
+      }
+
+      /* Color Picker */
+      .color-picker {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .color-preview {
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        border: 2px solid var(--border);
+      }
+
+      /* Buttons */
+      button {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn-primary {
+        background: var(--primary);
+        color: white;
+      }
+
+      .btn-primary:hover:not(:disabled) {
+        background: var(--primary-dark);
+      }
+
+      .btn-secondary {
+        background: var(--secondary);
+        color: white;
+      }
+
+      .btn-secondary:hover:not(:disabled) {
+        background: #4b5563;
+      }
+
+      .btn-success {
+        background: var(--success);
+        color: white;
+      }
+
+      .btn-danger {
+        background: var(--danger);
+        color: white;
+      }
+
+      button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .button-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 24px 32px;
+        background: var(--bg-primary);
+        border-top: 1px solid var(--border);
+      }
+
+      .button-group {
+        display: flex;
+        gap: 12px;
+      }
+
+      /* Status Messages */
+      .status-message {
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-size: 14px;
+        margin-bottom: 20px;
+        display: none;
+      }
+
+      .status-message.success {
+        background: #10b981;
+        color: white;
+        display: block;
+      }
+
+      .status-message.error {
+        background: var(--danger);
+        color: white;
+        display: block;
+      }
+
+      .status-message.warning {
+        background: var(--warning);
+        color: white;
+        display: block;
+      }
+
+      /* Configuration Preview */
+      .config-preview {
+        background: var(--bg-primary);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 16px;
+        margin-top: 20px;
+      }
+
+      .config-preview h3 {
+        margin: 0 0 12px 0;
+        font-size: 16px;
+        color: var(--text-secondary);
+      }
+
+      .config-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .config-item:last-child {
+        border-bottom: none;
+      }
+
+      .config-key {
+        font-weight: 500;
+        color: var(--text-secondary);
+      }
+
+      .config-value {
+        color: var(--text-primary);
+        font-family: monospace;
+      }
+
+      /* Loading States */
+      .loading {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid var(--border);
+        border-top: 2px solid var(--primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        main { padding: 20px; }
+        .form-row { grid-template-columns: 1fr; }
+        .button-row { flex-direction: column; gap: 16px; }
+        .header-content { text-align: center; }
+        .setup-progress { order: -1; }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="header-content">
+        <h1>Template Setup Wizard</h1>
+        <p>Configure your new Vite + React + FastAPI + PostgreSQL application</p>
+      </div>
+      <div class="setup-progress">
+        <div class="progress-step active" id="step-indicator-1">1</div>
+        <div class="progress-connector" id="connector-1"></div>
+        <div class="progress-step" id="step-indicator-2">2</div>
+        <div class="progress-connector" id="connector-2"></div>
+        <div class="progress-step" id="step-indicator-3">3</div>
+        <div class="progress-connector" id="connector-3"></div>
+        <div class="progress-step" id="step-indicator-4">4</div>
+        <div class="progress-connector" id="connector-4"></div>
+        <div class="progress-step" id="step-indicator-5">5</div>
+      </div>
+    </header>
+
+    <main>
+      <div class="wizard-container">
+        <!-- Step 1: App Identity -->
+        <div class="step-content active" id="step-1">
+          <div class="step-header">
+            <h2>🎯 App Identity</h2>
+            <p>Let's start by configuring your application's basic identity and branding</p>
+          </div>
+
+          <div class="status-message" id="step1-status"></div>
+
+          <div class="form-grid">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="app-name">App Name <span class="required">*</span></label>
+                <input type="text" id="app-name" placeholder="My Awesome App" required>
+                <div class="input-help">This will appear in browser tabs, PWA manifest, and package.json</div>
+              </div>
+
+              <div class="form-group">
+                <label for="app-slug">App Slug</label>
+                <input type="text" id="app-slug" placeholder="my-awesome-app" readonly>
+                <div class="input-help">Auto-generated slug used for database name and containers</div>
+              </div>
+            </div>
+
+            <div class="form-group full">
+              <label for="app-description">App Description</label>
+              <textarea id="app-description" rows="3" placeholder="A modern full-stack application built with React, FastAPI, and PostgreSQL"></textarea>
+              <div class="input-help">Used for SEO meta tags, PWA manifest, and package.json</div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="theme-color">Theme Color</label>
+                <div class="color-picker">
+                  <div class="color-preview" id="theme-color-preview"></div>
+                  <input type="color" id="theme-color" value="#646cff">
+                </div>
+                <div class="input-help">Primary brand color for PWA and UI theming</div>
+              </div>
+
+              <div class="form-group">
+                <label for="background-color">Background Color</label>
+                <div class="color-picker">
+                  <div class="color-preview" id="bg-color-preview"></div>
+                  <input type="color" id="background-color" value="#ffffff">
+                </div>
+                <div class="input-help">PWA splash screen background color</div>
+              </div>
+            </div>
+
+            <div class="config-preview">
+              <h3>Configuration Preview</h3>
+              <div class="config-item">
+                <span class="config-key">Package Name:</span>
+                <span class="config-value" id="preview-package-name">-</span>
+              </div>
+              <div class="config-item">
+                <span class="config-key">Database Name:</span>
+                <span class="config-value" id="preview-db-name">-</span>
+              </div>
+              <div class="config-item">
+                <span class="config-key">Container Prefix:</span>
+                <span class="config-value" id="preview-container-prefix">-</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Environment & Security -->
+        <div class="step-content" id="step-2">
+          <div class="step-header">
+            <h2>🔐 Environment & Security</h2>
+            <p>Configure secure credentials and environment variables</p>
+          </div>
+
+          <div class="status-message" id="step2-status"></div>
+
+          <div class="form-grid">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="secret-key">Secret Key</label>
+                <input type="password" id="secret-key" readonly>
+                <div class="input-help">Auto-generated secure key for JWT tokens</div>
+              </div>
+
+              <div class="form-group">
+                <label for="postgres-password">Database Password</label>
+                <input type="password" id="postgres-password">
+                <div class="input-help">Password for PostgreSQL database</div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="google-client-id">Google OAuth Client ID</label>
+                <input type="text" id="google-client-id" placeholder="123456789-abc.apps.googleusercontent.com">
+                <div class="input-help">From Google Cloud Console → Credentials</div>
+              </div>
+
+              <div class="form-group">
+                <label for="google-client-secret">Google OAuth Client Secret</label>
+                <input type="password" id="google-client-secret" placeholder="GOCSPX-...">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="github-repository">GitHub Repository</label>
+                <input type="text" id="github-repository" placeholder="username/repository-name">
+                <div class="input-help">For container registry deployment (ghcr.io)</div>
+              </div>
+
+              <div class="form-group">
+                <label for="image-tag">Image Tag</label>
+                <input type="text" id="image-tag" value="latest">
+                <div class="input-help">Docker image tag for deployment</div>
+              </div>
+            </div>
+
+            <div class="button-group">
+              <button type="button" class="btn-secondary" id="generate-secret">Generate New Secret Key</button>
+              <button type="button" class="btn-secondary" id="generate-password">Generate Database Password</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: Domain & Deployment -->
+        <div class="step-content" id="step-3">
+          <div class="step-header">
+            <h2>🌐 Domain & Deployment</h2>
+            <p>Configure your production domain and deployment settings</p>
+          </div>
+
+          <div class="status-message" id="step3-status"></div>
+
+          <div class="form-grid">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="domain">Production Domain</label>
+                <input type="text" id="domain" placeholder="myapp.com">
+                <div class="input-help">Your production domain (without https://)</div>
+              </div>
+
+              <div class="form-group">
+                <label for="acme-email">SSL Certificate Email</label>
+                <input type="email" id="acme-email" placeholder="admin@myapp.com">
+                <div class="input-help">Email for Let's Encrypt SSL certificates</div>
+              </div>
+            </div>
+
+            <div class="form-group full">
+              <h3>OAuth Redirect URLs</h3>
+              <div class="input-help">
+                Configure these redirect URLs in your OAuth providers:
+              </div>
+              <div class="config-preview">
+                <div class="config-item">
+                  <span class="config-key">Development:</span>
+                  <span class="config-value">http://localhost:5173/auth/callback</span>
+                </div>
+                <div class="config-item">
+                  <span class="config-key">Production:</span>
+                  <span class="config-value" id="production-callback">https://[domain]/auth/callback</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4: Authentication Setup -->
+        <div class="step-content" id="step-4">
+          <div class="step-header">
+            <h2>🔑 Authentication Setup</h2>
+            <p>Configure and test your authentication providers</p>
+          </div>
+
+          <div class="status-message" id="step4-status"></div>
+
+          <div class="form-grid">
+            <div class="form-group full">
+              <h3>Google OAuth Setup</h3>
+              <ol style="color: var(--text-secondary); line-height: 1.8;">
+                <li>Visit <a href="https://console.cloud.google.com/apis/credentials" target="_blank" style="color: var(--primary);">Google Cloud Console → Credentials</a></li>
+                <li>Create a new project or select an existing one</li>
+                <li>Go to "OAuth consent screen" → Choose "External" → Configure required fields</li>
+                <li>Add scopes: <code style="background: var(--bg-primary); padding: 2px 4px; border-radius: 4px;">email</code> and <code style="background: var(--bg-primary); padding: 2px 4px; border-radius: 4px;">profile</code></li>
+                <li>Create Credentials → "OAuth client ID" → "Web application"</li>
+                <li>Configure authorized origins and redirect URIs (see above)</li>
+                <li>Copy the Client ID and Client Secret to Step 2</li>
+              </ol>
+            </div>
+
+            <div class="button-group">
+              <button type="button" class="btn-secondary" id="test-auth-config">Test Auth Configuration</button>
+              <span id="auth-test-result" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                Testing...
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 5: Final Review -->
+        <div class="step-content" id="step-5">
+          <div class="step-header">
+            <h2>✅ Review & Apply</h2>
+            <p>Review your configuration and apply changes to your project</p>
+          </div>
+
+          <div class="status-message" id="step5-status"></div>
+
+          <div class="form-grid">
+            <div class="config-preview">
+              <h3>Final Configuration</h3>
+              <div id="final-config-preview">
+                <!-- Populated by JavaScript -->
+              </div>
+            </div>
+
+            <div class="form-group full">
+              <h3>What will be updated:</h3>
+              <ul style="color: var(--text-secondary);">
+                <li><strong>package.json</strong> - App name, description, and version</li>
+                <li><strong>manifest.json</strong> - PWA name, colors, and icons</li>
+                <li><strong>.env</strong> - Environment variables and secrets</li>
+                <li><strong>App icons</strong> - SVG files with custom branding</li>
+                <li><strong>SEO defaults</strong> - Meta tags and structured data</li>
+              </ul>
+            </div>
+
+            <div class="button-group" style="width: 100%; justify-content: center;">
+              <button type="button" class="btn-success" id="apply-config" style="font-size: 16px; padding: 16px 32px;">
+                🚀 Apply Configuration
+              </button>
+            </div>
+
+            <div id="apply-progress" style="display: none;">
+              <div class="loading" style="justify-content: center; margin: 20px 0;">
+                <div class="spinner"></div>
+                Applying configuration...
+              </div>
+              <div id="apply-log" style="background: var(--bg-primary); padding: 16px; border-radius: 8px; font-family: monospace; font-size: 12px; max-height: 300px; overflow-y: auto;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="button-row">
+          <button type="button" class="btn-secondary" id="prev-step" disabled>← Previous</button>
+          <div class="button-group">
+            <span id="step-indicator">Step 1 of 5</span>
+          </div>
+          <button type="button" class="btn-primary" id="next-step">Next →</button>
+        </div>
+      </div>
+    </main>
+
+    <script src="/wizard.js"></script>
+  </body>
+</html>
