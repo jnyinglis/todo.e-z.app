@@ -22,7 +22,7 @@ ARG GIT_COMMIT=unknown
 ARG ENVIRONMENT=development
 
 # Create build info for development
-RUN echo "{ \
+RUN mkdir -p public && echo "{ \
   \"version\": \"$BUILD_VERSION\", \
   \"buildNumber\": \"$BUILD_NUMBER\", \
   \"gitCommit\": \"$GIT_COMMIT\", \

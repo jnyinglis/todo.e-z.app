@@ -2,6 +2,13 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+Review the README.md file.
+
+On first use you should explain that this repo is the starting point for developing a new app.
+
+One of the key things is the configuraion wizard. Before the app is deployed to production, use the playwright mcp add-on to guide the user through then setup questions.
+
+
 ## Project Architecture
 
 This is a full-stack monorepo template with:

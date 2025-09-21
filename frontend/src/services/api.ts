@@ -29,6 +29,28 @@ type AuthTokens = {
   expires_in: number;
 };
 
+type Todo = {
+  id: string;
+  title: string;
+  description?: string;
+  completed: boolean;
+  user_id: string;
+  created_at: string;
+  updated_at?: string;
+};
+
+type TodoCreate = {
+  title: string;
+  description?: string;
+  completed?: boolean;
+};
+
+type TodoUpdate = {
+  title?: string;
+  description?: string;
+  completed?: boolean;
+};
+
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 class ApiService {
@@ -220,6 +242,36 @@ class ApiService {
     return !!tokens?.access_token;
   }
 
+  // Todo endpoints
+  async getTodos(): Promise<Todo[]> {
+    const response: AxiosResponse<Todo[]> = await this.api.get('/api/todos');
+    return response.data;
+  }
+
+  async createTodo(todoData: TodoCreate): Promise<Todo> {
+    const response: AxiosResponse<Todo> = await this.api.post('/api/todos', todoData);
+    return response.data;
+  }
+
+  async getTodo(todoId: string): Promise<Todo> {
+    const response: AxiosResponse<Todo> = await this.api.get(`/api/todos/${todoId}`);
+    return response.data;
+  }
+
+  async updateTodo(todoId: string, todoData: TodoUpdate): Promise<Todo> {
+    const response: AxiosResponse<Todo> = await this.api.put(`/api/todos/${todoId}`, todoData);
+    return response.data;
+  }
+
+  async deleteTodo(todoId: string): Promise<void> {
+    await this.api.delete(`/api/todos/${todoId}`);
+  }
+
+  async toggleTodoCompletion(todoId: string): Promise<Todo> {
+    const response: AxiosResponse<Todo> = await this.api.patch(`/api/todos/${todoId}/toggle`);
+    return response.data;
+  }
+
   // Health check
   async healthCheck(): Promise<{ status: string; timestamp: string; service: string }> {
     const response = await this.api.get('/api/health');
@@ -229,3 +281,6 @@ class ApiService {
 
 export const apiService = new ApiService();
 export default apiService;
+
+// Export types
+export type { Todo, TodoCreate, TodoUpdate };

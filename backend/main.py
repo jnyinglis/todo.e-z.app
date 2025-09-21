@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 from app.core.database import create_tables
-from app.api import auth, users, health, build_info, seo
+from app.api import auth, users, health, build_info, seo, todos
 from app.core.security_config import apply_security_middleware, validate_security_config
 from app.core.logging_config import (
     setup_logging,
@@ -71,6 +71,7 @@ app.include_router(health.router, prefix="/api", tags=["health"])
 app.include_router(build_info.router, prefix="/api", tags=["build-info"])
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(users.router, prefix="/api/users", tags=["users"])
+app.include_router(todos.router, prefix="/api/todos", tags=["todos"])
 app.include_router(seo.router, tags=["seo"])
 
 

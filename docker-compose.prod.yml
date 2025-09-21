@@ -36,7 +36,8 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.backend.rule=Host(`${DOMAIN}`) && PathPrefix(`/api`)"
       - "traefik.http.routers.backend.entrypoints=websecure"
-      - "traefik.http.routers.backend.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.backend.tls=true" # added this for cloudflare
+      - "traefik.http.routers.backend.tls.certresolver=cfresolver" # changed from letsencrypyt for cloudflare
       - "traefik.http.services.backend.loadbalancer.server.port=8000"
 
   # Frontend
@@ -48,8 +49,11 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=Host(`${DOMAIN}`)"
       - "traefik.http.routers.frontend.entrypoints=websecure"
-      - "traefik.http.routers.frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.frontend.tls=true" # added this for cloudflare
+      - "traefik.http.routers.frontend.tls.certresolver=cfresolver" # changed from letsencrypyt for cloudflare
       - "traefik.http.services.frontend.loadbalancer.server.port=80"
+      - "traefik.http.routers.frontend.tls.domains[0].main=${DOMAIN_BASE}"
+      - "traefik.http.routers.frontend.tls.domains[0].sans=*.${DOMAIN_BASE}"
 
   # Traefik Reverse Proxy
   traefik:
@@ -60,15 +64,29 @@ services:
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
-      - "--certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL}"
-      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      # switch from TLS-ALPN-01 to DNS-01 via Clouflare
+      - "--certificatesresolvers.cfresolver.acme.email=${ACME_EMAIL}"
+      - "--certificatesresolvers.cfresolver.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.cfresolver.acme.dnschallenge.provider=cloudflare"
+      # Optional during testing to avoid LE rate limits:
+      # - "--certificatesresolvers.cfresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+
+      # - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      # - "--certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL}"
+      # - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      # (optional, forward real client IPs from Cloudflare)
+      - "--entrypoints.websecure.forwardedheaders.trustedips=173.245.48.0/20,103.21.244.0/22,103.22.200.0/22,103.31.4.0/22,141.101.64.0/18,108.162.192.0/18,190.93.240.0/20,188.114.96.0/20,197.234.240.0/22,198.41.128.0/17,162.158.0.0/15,104.16.0.0/13,104.24.0.0/14,172.64.0.0/13,131.0.72.0/22"
       - "--global.checknewversion=false"
       - "--global.sendanonymoususage=false"
     ports:
       - "80:80"
       - "443:443"
       - "8080:8080"  # Traefik dashboard
+    environment:
+      # Use one of these (Traefik/lego supports both). Token must have Zone:DNS:Edit + Zone:Read for your zone
+      CF_DNS_API_TOKEN: "${CF_DNS_API_TOKEN}"
+      # or: CF_API_TOKEN: "${CF_API_TOKEN}"
+
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - letsencrypt:/letsencrypt
@@ -78,9 +96,12 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)"
       - "traefik.http.routers.traefik.entrypoints=websecure"
-      - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.traefik.tls=true"
+      - "traefik.http.routers.traefik.tls.certresolver=cfresolver"   # <- was letsencrypt
       - "traefik.http.routers.traefik.service=api@internal"
-
+      # (optional) protect dashboard with basic auth middleware (see below)
+      # - "traefik.http.middlewares.dash-auth.basicauth.users=admin:$$apr1$$1d...<htpasswd-hash>"
+      # - "traefik.http.routers.traefik.middlewares=dash-auth@docker"
 networks:
   app-network:
     driver: bridge

@@ -4,6 +4,7 @@ import apiService from './services/api';
 import { SEOHead } from './components/SEOHead';
 import { createWebsiteSchema } from './utils/seoSchemas';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
+import TodoList from './components/TodoList';
 import {
   authConfig,
   isEmailPasswordEnabled,
@@ -260,41 +261,50 @@ function LoginForm() {
     return (
       <>
         <SEOHead
-          title="Dashboard"
-          description="User dashboard for authenticated users"
+          title="Todo App"
+          description="Manage your todos efficiently"
           jsonLD={websiteSchema}
         />
-        <div style={{ maxWidth: '400px', margin: '0 auto', padding: '2rem' }}>
-        <h1>Welcome, {currentUser.full_name || currentUser.email}!</h1>
-        <p>You are successfully authenticated.</p>
-
-        <div style={{
-          padding: '1rem',
-          backgroundColor: '#f8f9fa',
-          borderRadius: '4px',
-          marginBottom: '2rem'
-        }}>
-          <p><strong>User Information:</strong></p>
-          <p>Email: {currentUser.email}</p>
-          <p>Full Name: {currentUser.full_name || 'Not provided'}</p>
-          <p>Verified: {currentUser.is_verified ? '✅ Yes' : '❌ No'}</p>
-        </div>
-
-        <button
-          onClick={handleLogout}
-          style={{
-            padding: '0.75rem 1.5rem',
-            backgroundColor: '#dc3545',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontSize: '1rem',
-            width: '100%'
-          }}
-        >
-          Logout
-        </button>
+        <div style={{ minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
+          <header style={{
+            backgroundColor: '#ffffff',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            padding: '1rem 0',
+            marginBottom: '2rem'
+          }}>
+            <div style={{
+              maxWidth: '600px',
+              margin: '0 auto',
+              padding: '0 1rem',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <div>
+                <h2 style={{ margin: 0 }}>Todo App</h2>
+                <p style={{ margin: 0, color: '#6c757d', fontSize: '0.9rem' }}>
+                  Welcome, {currentUser.full_name || currentUser.email}!
+                </p>
+              </div>
+              <button
+                onClick={handleLogout}
+                style={{
+                  padding: '0.5rem 1rem',
+                  backgroundColor: '#dc3545',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem'
+                }}
+              >
+                Logout
+              </button>
+            </div>
+          </header>
+          <main>
+            <TodoList />
+          </main>
         </div>
       </>
     );
