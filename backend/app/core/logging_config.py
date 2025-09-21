@@ -136,14 +136,10 @@ class StructuredFormatter(logging.Formatter):
 def setup_logging() -> None:
     """Configure application logging."""
 
-    # Create logs directory
-    log_dir = Path("logs")
-    log_dir.mkdir(exist_ok=True)
-
     # Determine log level
     log_level = "DEBUG" if settings.debug else "INFO"
 
-    # Logging configuration
+    # Logging configuration - container-friendly (stdout only)
     logging_config = {
         "version": 1,
         "disable_existing_loggers": False,
@@ -161,46 +157,28 @@ def setup_logging() -> None:
                 "level": log_level,
                 "formatter": "structured",
                 "stream": "ext://sys.stdout"
-            },
-            "file": {
-                "class": "logging.handlers.RotatingFileHandler",
-                "level": log_level,
-                "formatter": "structured",
-                "filename": str(log_dir / "app.log"),
-                "maxBytes": 10485760,  # 10MB
-                "backupCount": 5,
-                "encoding": "utf8"
-            },
-            "error_file": {
-                "class": "logging.handlers.RotatingFileHandler",
-                "level": "ERROR",
-                "formatter": "structured",
-                "filename": str(log_dir / "error.log"),
-                "maxBytes": 10485760,  # 10MB
-                "backupCount": 5,
-                "encoding": "utf8"
             }
         },
         "loggers": {
             # Application loggers
             "app": {
                 "level": log_level,
-                "handlers": ["console", "file"],
+                "handlers": ["console"],
                 "propagate": False
             },
             "api.requests": {
                 "level": "INFO",
-                "handlers": ["console", "file"],
+                "handlers": ["console"],
                 "propagate": False
             },
             "api.auth": {
                 "level": log_level,
-                "handlers": ["console", "file"],
+                "handlers": ["console"],
                 "propagate": False
             },
             "api.errors": {
                 "level": "ERROR",
-                "handlers": ["console", "error_file"],
+                "handlers": ["console"],
                 "propagate": False
             },
             # Third-party loggers
@@ -211,7 +189,7 @@ def setup_logging() -> None:
             },
             "sqlalchemy.engine": {
                 "level": "WARNING",
-                "handlers": ["file"],
+                "handlers": ["console"],
                 "propagate": False
             }
         },
