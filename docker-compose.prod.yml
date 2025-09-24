@@ -34,10 +34,18 @@ services:
       - app-network
     labels:
       - "traefik.enable=true"
+      # API routes
       - "traefik.http.routers.backend.rule=Host(`${DOMAIN}`) && PathPrefix(`/api`)"
       - "traefik.http.routers.backend.entrypoints=websecure"
       - "traefik.http.routers.backend.tls=true" # added this for cloudflare
       - "traefik.http.routers.backend.tls.certresolver=cfresolver" # changed from letsencrypyt for cloudflare
+      # SEO routes (higher priority than frontend catch-all)
+      - "traefik.http.routers.backend-seo.rule=Host(`${DOMAIN}`) && (Path(`/robots.txt`) || Path(`/sitemap.xml`) || PathPrefix(`/.well-known`))"
+      - "traefik.http.routers.backend-seo.entrypoints=websecure"
+      - "traefik.http.routers.backend-seo.tls=true"
+      - "traefik.http.routers.backend-seo.tls.certresolver=cfresolver"
+      - "traefik.http.routers.backend-seo.priority=100"
+      # Service configuration
       - "traefik.http.services.backend.loadbalancer.server.port=8000"
 
   # Frontend
