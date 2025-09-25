@@ -27,6 +27,7 @@ services:
       - SECRET_KEY=${SECRET_KEY}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - FRONTEND_URL=https://${DOMAIN}
     depends_on:
       db:
         condition: service_healthy
